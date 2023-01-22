@@ -5,6 +5,7 @@ import ja from 'date-fns/locale/ja';
 import axios from 'axios';
 import addDays from 'date-fns/addDays';
 import { Result } from './Result';
+import { Loading } from './Loading';
 
 export type Plan = {
   plan_id: Key;
@@ -28,11 +29,13 @@ export const Home = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansCount, setPlansCount] = useState<number | undefined>(undefined);
   const [hasError, setHasError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   registerLocale('ja', ja);
 
   const onFormSubmit = async (event: { preventDefault: () => void }) => {
     try {
       event.preventDefault();
+      setLoading(true);
       const response = await axios.get(
         'https://l1kwik11ne.execute-api.ap-northeast-1.amazonaws.com/production/golf-courses',
         {
@@ -46,6 +49,7 @@ export const Home = () => {
       );
       setPlans(response.data.plans);
       setPlansCount(response.data.plansCount);
+      setLoading(false);
     } catch (e) {
       console.log(e);
       setHasError(true);
@@ -121,6 +125,7 @@ export const Home = () => {
             </button>
           </div>
         </form>
+        <Loading loading={loading} />
         <Result plans={plans} plansCount={plansCount} error={hasError} />
       </div>
     </div>
